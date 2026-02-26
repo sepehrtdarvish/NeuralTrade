@@ -1,0 +1,20 @@
+# Environments
+.env
+venv/
+env/
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
+
+# Data & Logs
+*.log
+data/*.json
+data/*.csv
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+thumbs.db

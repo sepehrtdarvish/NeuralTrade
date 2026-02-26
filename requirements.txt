@@ -1,0 +1,21 @@
+# AI & LLM Frameworks
+langchain
+langchain-openai
+langchain-google-genai
+crewai
+google-generativeai
+
+# Data Extraction & APIs
+youtube-transcript-api
+google-api-python-client
+ccxt
+requests
+beautifulsoup4
+
+# Data Processing
+pandas
+numpy
+python-dotenv
+
+# Scrapper
+feedparser
