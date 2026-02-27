@@ -1,64 +1,49 @@
-import google.generativeai as genai
-from google.api_core.client_options import ClientOptions
-from config import config
+from utils import MetisClient
 
 class MarketAnalyzer:
     def __init__(self):
         # Configure Gemini via Metis AI Gateway
-        genai.configure(
-            api_key=config.METIS_API_KEY,
-            transport='rest',
-            client_options=ClientOptions(api_endpoint=config.API_ENDPOINT)
-        )
-        self.model = genai.GenerativeModel(config.MODEL_NAME)
+        self.model = MetisClient()
 
-    def generate_trading_signal(self, news_data, research_data, macro_data):
+    def generate_trading_signal(self, news_data, research_data, tech_data):
+        # Format the technical string including Sentiment
+        fng_info = f"{tech_data['sentiment']['fng_score']} ({tech_data['sentiment']['fng_label']})"
+        
+        tech_text = f"""
+        --- CURRENT MARKET METRICS ---
+        Price: ${tech_data['current_price']:,.2f}
+        24h Change: {tech_data['price_change_24h']}%
+        7d Change: {tech_data['price_change_7d']}%
+        24h Volume: ${tech_data['total_volume_24h']:,.0f}
+        Market Sentiment (Fear & Greed): {fng_info}
         """
-        Combines data from all 3 nodes and requests a swing-trading analysis from the LLM.
-        """
-        # 1. Format News Data
-        news_text = "--- SHORT-TERM NEWS & SENTIMENT ---\n"
-        for i, item in enumerate(news_data, 1):
-            news_text += f"{i}. {item['title']} (Date: {item['date']})\n"
 
-        # 2. Format On-Chain/Research Data
-        research_text = "\n--- MID-TERM ON-CHAIN & FUNDAMENTALS ---\n"
-        for i, item in enumerate(research_data, 1):
-            research_text += f"{i}. {item['title']}\nSummary: {item['summary']}\n"
+        # (Keep news_text and research_text formatting as before)
 
-        # 3. Format Macroeconomic Data
-        macro_text = "\n--- LONG-TERM MACROECONOMICS ---\n"
-        for i, item in enumerate(macro_data, 1):
-            macro_text += f"{i}. Source: {item['source']} | {item['title']}\nSummary: {item['summary']}\n"
-
-        # 4. Construct the System Prompt (The Secret Sauce)
         system_prompt = f"""
-        Act as an expert Quantitative Analyst and Swing Trader. Your goal is to analyze the provided data streams and output a highly logical swing trading signal (holding period: 3 to 14 days) for the general crypto market (focusing on Bitcoin).
+        Act as a Senior Quantitative Strategist. Your goal is a 3-14 day Swing Trade signal for Bitcoin.
         
-        Rule 1: Ignore short-term noise. Focus on the convergence of On-chain data and Macro trends.
-        Rule 2: Do NOT recommend high leverage or scalping.
-        Rule 3: Be extremely concise and structured.
+        DATA ANALYSIS HIERARCHY:
+        1. SENTIMENT & MOMENTUM: Use the Fear & Greed Index + 7d Change to identify overbought/oversold conditions. 
+           (e.g., Extreme Fear at support levels is often a BUY catalyst).
+        2. ON-CHAIN FILTER: Ensure the mid-term trend (Glassnode) isn't heavily bearish before calling a Long.
+        3. NEWS CATALYST: Check if recent news supports or contradicts the technical momentum.
 
-        Here is the collected data:
-        {news_text}
-        {research_text}
-        {macro_text}
+        DATA INPUTS:
+        {tech_text}
+        {news_data}
+        {research_data}
 
-        Please provide your analysis in the exact following format:
-        
-        📈 FINAL SIGNAL: [BULLISH, BEARISH, or NEUTRAL]
-        🎯 CONFIDENCE SCORE: [0 to 100]%
-        
-        🔍 KEY DRIVERS (Max 3 bullet points):
-        - ...
-        
-        💡 SWING TRADE ACTION:
-        [Explain what action to take right now with spot assets. E.g., "Accumulate slowly", "Hold cash", "Take profits"]
+        OUTPUT FORMAT:
+        📈 FINAL SIGNAL: [BULLISH / BEARISH / NEUTRAL]
+        🎯 CONFIDENCE: [0-100]%
+        🔍 REASONING: (3 bullet points max)
+        💡 ACTION: (Specific spot trading advice)
         """
 
         try:
             # Generate the response
-            response = self.model.generate_content(system_prompt)
-            return response.text
+            response = self.model.send(prompt=system_prompt)
+            return response
         except Exception as e:
             return f"Error connecting to AI model: {e}"

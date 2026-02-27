@@ -9,17 +9,17 @@ METIS_API_KEY = os.getenv("METIS_API_KEY")
 API_ENDPOINT = "https://api.tapsage.com"
 
 # The designated Gemini model
-MODEL_NAME = "gemini-2.0-flash"
+SUMMARIES_MODEL_NAME = "gemini-2.0-flash"
+ANALYSIS_MODEL_NAME ="gemini-2.0-flash"
 
 # The prompt to send to the model
-USER_PROMPT = "Explain the concept of decorators in Python in simple terms."
-
-
-YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
-
-# Crypto Panic
-CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY")
-
-DEFAULT_NEWS_DAYS = 1
-DEFAULT_NEWS_FILTER = "hot"
-DEFAULT_NEWS_LIMIT = 20
+DEFAULT_NEWS_DAYS = 2  # دریافت اخبار تا چند روز گذشته
+    
+    # لیست بهترین فیدهای RSS اختصاصی و کلان برای بیت‌کوین
+BITCOIN_RSS_FEEDS = [
+    "https://cointelegraph.com/rss/tag/bitcoin",
+    "https://bitcoinmagazine.com/feed",
+    "https://decrypt.co/feed",
+    "https://www.newsbtc.com/feed/",
+    #"https://www.coindesk.com/arc/outboundfeeds/rss/"
+]

@@ -3,7 +3,7 @@ langchain
 langchain-openai
 langchain-google-genai
 crewai
-google-generativeai
+google-genai
 
 # Data Extraction & APIs
 youtube-transcript-api
@@ -19,3 +19,5 @@ python-dotenv
 
 # Scrapper
 feedparser
+newspaper3k
+lxml_html_clean
